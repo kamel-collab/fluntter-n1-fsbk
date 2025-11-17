@@ -9,7 +9,22 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Exercice Stateless")),
-      body: Column(children: [ZoneOne(), Profil(), ZoneOne()]),
+      body: ListView.builder(
+        itemCount: 20,
+        itemBuilder: (BuildContext context, int index) {
+          return Card(
+            child: InkWell(
+              onTap: () {
+                print("ok");
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text("Card Item$index"),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
