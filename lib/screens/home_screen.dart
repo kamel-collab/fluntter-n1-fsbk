@@ -5,25 +5,27 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("je suis dans home screen");
     return Scaffold(
-      appBar: AppBar(title: const Text('Home Screen')),
-      body: const Center(child: Text('Welcome to the Home Screen!')),
+      appBar: AppBar(
+        title: Text('My Ecomm APP', style: TextStyle(color: Colors.white)),
+        centerTitle: true,
+        backgroundColor: Colors.deepOrange,
+        elevation: 4.0,
+      ),
+      body: Center(child: Text('Home Screen')),
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 0,
+        backgroundColor: Colors.deepOrange,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white70,
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
+            icon: Icon(Icons.shopping_cart),
+            label: 'Cart',
           ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
-        onTap: (index) {
-          if (index == 0) {
-            Navigator.pushNamed(context, '/');
-          } else if (index == 1) {
-            Navigator.pushNamed(context, '/settings');
-          }
-        },
       ),
     );
   }
