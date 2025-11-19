@@ -1,3 +1,4 @@
+import 'package:first/screens/detail_screen.dart';
 import 'package:first/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -17,6 +18,7 @@ class MyApp extends StatelessWidget {
         iconTheme: IconThemeData(color: Colors.white),
       ),
       home: HomeScreen(),
+      routes: {DetailScreen.route: (context) => DetailScreen()},
     );
   }
 }

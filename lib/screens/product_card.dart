@@ -1,3 +1,4 @@
+import 'package:first/screens/detail_screen.dart';
 import 'package:first/screens/product.dart';
 import 'package:flutter/material.dart';
 
@@ -9,13 +10,23 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          DetailScreen.route,
+          arguments: {
+            "name": product.name,
+            "imageUrl": product.imageUrl,
+            "price": product.price,
+          },
+        );
+      },
       child: Card(
         elevation: 4.0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
+
           children: [
             Stack(
               children: [
@@ -51,7 +62,7 @@ class ProductCard extends StatelessWidget {
                     ),
                     maxLines: 2,
                   ),
-                  SizedBox(height: 4),
+
                   Text(
                     "${product.price} da",
                     style: TextStyle(color: Colors.deepOrange, fontSize: 13),
