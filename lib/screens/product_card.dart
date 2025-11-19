@@ -1,17 +1,10 @@
+import 'package:first/screens/product.dart';
 import 'package:flutter/material.dart';
 
 class ProductCard extends StatelessWidget {
-  final String imageUrl;
-  final String name;
-  final double price;
   final VoidCallback? onTap;
-  const ProductCard({
-    super.key,
-    required this.imageUrl,
-    required this.name,
-    required this.price,
-    this.onTap,
-  });
+  final Product product;
+  const ProductCard({super.key, this.onTap, required this.product});
   //
   @override
   Widget build(BuildContext context) {
@@ -28,7 +21,7 @@ class ProductCard extends StatelessWidget {
               children: [
                 AspectRatio(
                   aspectRatio: 1,
-                  child: Image.network(imageUrl, fit: BoxFit.cover),
+                  child: Image.network(product.imageUrl, fit: BoxFit.cover),
                 ),
                 Positioned(
                   top: 8,
@@ -50,10 +43,13 @@ class ProductCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name, style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                    product.name,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   SizedBox(height: 4),
                   Text(
-                    "$price da",
+                    "${product.price} da",
                     style: TextStyle(color: Colors.deepOrange, fontSize: 13),
                   ),
                 ],

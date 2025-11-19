@@ -1,9 +1,17 @@
+import 'package:first/screens/product.dart';
 import 'package:first/screens/product_card.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
+  HomeScreen({super.key});
+  final List<Product> products = [
+    Product(
+      imageUrl:
+          "https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg",
+      name: 'product name',
+      price: 2500,
+    ),
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,14 +21,7 @@ class HomeScreen extends StatelessWidget {
         backgroundColor: Colors.deepOrange,
         elevation: 4.0,
       ),
-      body: Center(
-        child: ProductCard(
-          imageUrl:
-              "https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg",
-          name: 'product name',
-          price: 2500,
-        ),
-      ),
+      body: Center(child: ProductCard(product: products[0])),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
         backgroundColor: Colors.deepOrange,
