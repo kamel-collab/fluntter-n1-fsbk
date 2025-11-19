@@ -11,6 +11,60 @@ class HomeScreen extends StatelessWidget {
       name: 'product name',
       price: 2500,
     ),
+    Product(
+      imageUrl:
+          "https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg",
+      name: 'product name kamel chbabe hayel cinema chriki',
+      price: 2500,
+    ),
+    Product(
+      imageUrl:
+          "https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg",
+      name: 'product name',
+      price: 2500,
+    ),
+    Product(
+      imageUrl:
+          "https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg",
+      name: 'product name',
+      price: 2500,
+    ),
+    Product(
+      imageUrl:
+          "https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg",
+      name: 'product name',
+      price: 2500,
+    ),
+    Product(
+      imageUrl:
+          "https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg",
+      name: 'product name',
+      price: 2500,
+    ),
+    Product(
+      imageUrl:
+          "https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg",
+      name: 'product name',
+      price: 2500,
+    ),
+    Product(
+      imageUrl:
+          "https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg",
+      name: 'product name',
+      price: 2500,
+    ),
+    Product(
+      imageUrl:
+          "https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg",
+      name: 'product name',
+      price: 2500,
+    ),
+    Product(
+      imageUrl:
+          "https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg",
+      name: 'product name',
+      price: 2500,
+    ),
   ];
   @override
   Widget build(BuildContext context) {
@@ -21,7 +75,28 @@ class HomeScreen extends StatelessWidget {
         backgroundColor: Colors.deepOrange,
         elevation: 4.0,
       ),
-      body: Center(child: ProductCard(product: products[0])),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          double cardWidth = 180;
+          int crossAxisCount = (constraints.maxWidth / cardWidth).floor();
+          if (crossAxisCount < 2) {
+            crossAxisCount = 2;
+          }
+          return GridView.builder(
+            padding: const EdgeInsets.all(8.0),
+            itemCount: products.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+              childAspectRatio: 0.7,
+            ),
+            itemBuilder: (context, index) {
+              return ProductCard(product: products[index]);
+            },
+          );
+        },
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
         backgroundColor: Colors.deepOrange,
