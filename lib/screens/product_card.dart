@@ -2,16 +2,27 @@ import 'package:first/screens/detail_screen.dart';
 import 'package:first/screens/product.dart';
 import 'package:flutter/material.dart';
 
-class ProductCard extends StatelessWidget {
+class ProductCard extends StatefulWidget {
   final VoidCallback? onTap;
   final Product product;
   const ProductCard({super.key, this.onTap, required this.product});
+
+  @override
+  State<ProductCard> createState() => _ProductCardState();
+}
+
+class _ProductCardState extends State<ProductCard> {
   //
+  String aa = "clicke me";
   @override
   Widget build(BuildContext context) {
+    print("je suis ton pere");
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(
+        setState(() {
+          aa = "c bon";
+        });
+        /* Navigator.pushNamed(
           context,
           DetailScreen.route,
           arguments: {
@@ -19,7 +30,7 @@ class ProductCard extends StatelessWidget {
             "imageUrl": product.imageUrl,
             "price": product.price,
           },
-        );
+        );*/
       },
       child: Card(
         elevation: 4.0,
@@ -32,20 +43,12 @@ class ProductCard extends StatelessWidget {
               children: [
                 AspectRatio(
                   aspectRatio: 1,
-                  child: Image.network(product.imageUrl, fit: BoxFit.cover),
-                ),
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black87,
-                      shape: BoxShape.circle,
-                    ),
-                    padding: EdgeInsets.all(6.0),
-                    child: Icon(Icons.favorite_border),
+                  child: Image.network(
+                    widget.product.imageUrl,
+                    fit: BoxFit.cover,
                   ),
                 ),
+                Positioned(top: 8, right: 8, child: Favorit(isFavorit: false)),
               ],
             ),
 
@@ -55,7 +58,7 @@ class ProductCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    product.name,
+                    widget.product.name,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       overflow: TextOverflow.ellipsis,
@@ -64,7 +67,7 @@ class ProductCard extends StatelessWidget {
                   ),
 
                   Text(
-                    "${product.price} da",
+                    "${widget.product.price} ${aa} da",
                     style: TextStyle(color: Colors.deepOrange, fontSize: 13),
                   ),
                 ],
@@ -72,6 +75,39 @@ class ProductCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class Favorit extends StatefulWidget {
+  bool isFavorit;
+  Favorit({super.key, required this.isFavorit});
+
+  @override
+  State<Favorit> createState() => _FavoritState();
+}
+
+class _FavoritState extends State<Favorit> {
+  @override
+  Widget build(BuildContext context) {
+    print("im your favorite");
+    return InkWell(
+      onTap: () {
+        print('tapped');
+        setState(() {
+          widget.isFavorit = !widget.isFavorit;
+        });
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.black87,
+          shape: BoxShape.circle,
+        ),
+        padding: EdgeInsets.all(6.0),
+        child: widget.isFavorit
+            ? Icon(Icons.favorite, color: Colors.yellow)
+            : Icon(Icons.favorite, color: Colors.white),
       ),
     );
   }
