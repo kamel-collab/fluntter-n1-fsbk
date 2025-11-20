@@ -106,7 +106,7 @@ class _TransactionsSectionState extends State<TransactionsSection> {
         _filterButton("Tout", null),
         const SizedBox(width: 8),
         _filterButton("Revenus", TransactionType.revenu),
-        const SizedBox(width: 8),
+        Spacer(),
         _filterButton("Dépenses", TransactionType.depense),
       ],
     );

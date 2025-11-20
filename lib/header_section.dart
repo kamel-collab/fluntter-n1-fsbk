@@ -1,3 +1,4 @@
+import 'package:first/graph_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:first/circle_icon_button.dart';
 import 'package:first/dot.dart';
@@ -158,6 +159,16 @@ class _HeaderSectionState extends State<HeaderSection> {
     return Stack(
       alignment: Alignment.center,
       children: [
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: SizedBox(
+            height: 140,
+            child: Opacity(opacity: 0.40, child: AccountGraph()),
+          ),
+        ),
+
         SizedBox(
           height: 160,
 
