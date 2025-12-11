@@ -10,7 +10,7 @@ class Dot extends StatelessWidget {
       width: isActive ? 10 : 6,
       height: isActive ? 10 : 6,
       decoration: BoxDecoration(
-        color: isActive ? Colors.blue : Colors.grey,
+        color: isActive ? Colors.white : Colors.white.withOpacity(0.4),
         shape: BoxShape.circle,
       ),
     );

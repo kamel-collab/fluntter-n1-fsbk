@@ -1,6 +1,11 @@
 class Account {
   final String label;
-  final double balance;
+  final double solde;
+  final double veille;
 
-  Account({required this.label, required this.balance});
+  const Account({
+    required this.label,
+    required this.solde,
+    required this.veille,
+  });
 }
