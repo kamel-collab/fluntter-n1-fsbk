@@ -1,13 +1,22 @@
 // lib/main.dart
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-// Screens
+import 'providers/theme_provider.dart';
+import 'utils/app_themes.dart';
+
+// screens
 import 'features/auth/pages/login_screen.dart';
 import 'features/home/pages/home_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => ThemeProvider())],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -15,10 +24,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      title: "Bank App",
 
-      // 🧭 Routes Nomées
+      theme: AppThemes.lightTheme,
+      darkTheme: AppThemes.darkTheme,
+
+      themeMode: themeProvider.themeMode,
+
       initialRoute: LoginScreen.routeName,
       routes: {
         LoginScreen.routeName: (context) => const LoginScreen(),
