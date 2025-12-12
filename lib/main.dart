@@ -1,4 +1,9 @@
+// lib/main.dart
+
 import 'package:flutter/material.dart';
+
+// Screens
+import 'features/auth/pages/login_screen.dart';
 import 'features/home/pages/home_screen.dart';
 
 void main() {
@@ -12,7 +17,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const HomeScreen(),
+
+      // 🧭 Routes Nomées
+      initialRoute: LoginScreen.routeName,
+      routes: {
+        LoginScreen.routeName: (context) => const LoginScreen(),
+        HomeScreen.routeName: (context) => const HomeScreen(),
+      },
     );
   }
 }
