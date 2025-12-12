@@ -1,13 +1,18 @@
 // lib/main.dart
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-// Screens
-import 'features/auth/pages/login_screen.dart';
-import 'features/home/pages/home_screen.dart';
+import 'providers/counter_provider.dart';
+import 'screens/counter_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => CounterProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -17,13 +22,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-
-      // 🧭 Routes Nomées
-      initialRoute: LoginScreen.routeName,
-      routes: {
-        LoginScreen.routeName: (context) => const LoginScreen(),
-        HomeScreen.routeName: (context) => const HomeScreen(),
-      },
+      title: "Provider Counter Example",
+      home: const CounterScreen(),
     );
   }
 }
