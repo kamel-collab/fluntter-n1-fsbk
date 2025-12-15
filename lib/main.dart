@@ -1,5 +1,6 @@
 // lib/main.dart
 
+import 'package:first/blocs/transactions/transactions_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -17,7 +18,11 @@ import 'package:first/blocs/header/header_bloc.dart';
 void main() {
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => ThemeProvider())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        BlocProvider<TransactionsBloc>(create: (_) => TransactionsBloc()),
+      ],
+
       child: const MyApp(),
     ),
   );
