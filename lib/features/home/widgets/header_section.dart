@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../core/widgets/circle_icon_button.dart';
 import '../../../core/widgets/dot.dart';
 import '../../../core/widgets/graph_widget.dart';
-import '../models/account.dart';
+
+import 'package:first/blocs/header/header_bloc.dart';
+import 'package:first/blocs/header/header_event.dart';
+import 'package:first/blocs/header/header_state.dart';
 
 class HeaderSection extends StatefulWidget {
   const HeaderSection({super.key});
@@ -12,20 +17,13 @@ class HeaderSection extends StatefulWidget {
 }
 
 class _HeaderSectionState extends State<HeaderSection> {
-  final PageController _controller = PageController();
+  late final PageController _controller;
 
-  int currentPage = 0;
-  bool isHidden = false;
-
-  final List<Account> accounts = const [
-    Account(
-      label: "CPTES CHEQUES PERS.FRANSABANK",
-      solde: 2589.50,
-      veille: 3189.50,
-    ),
-    Account(label: "COMPTE ÉPARGNE", solde: 12000.00, veille: 11800.00),
-    Account(label: "COMPTE PROFESSIONNEL", solde: 460000.75, veille: 459800.20),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _controller = PageController();
+  }
 
   @override
   void dispose() {
@@ -35,42 +33,53 @@ class _HeaderSectionState extends State<HeaderSection> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF004AAD), Color(0xFF005FCC)],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(32),
-          bottomRight: Radius.circular(32),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _topBar(),
-          const SizedBox(height: 24),
-          _accountsPageView(),
-          const SizedBox(height: 16),
-          _dotsIndicator(),
-        ],
-      ),
+    return BlocBuilder<HeaderBloc, HeaderState>(
+      builder: (context, state) {
+        final bloc = context.read<HeaderBloc>();
+
+        return Container(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF004AAD), Color(0xFF005FCC)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(32),
+              bottomRight: Radius.circular(32),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _topBar(state, bloc),
+              const SizedBox(height: 24),
+              _accountsPageView(state, bloc),
+              const SizedBox(height: 16),
+              _dotsIndicator(state),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  Widget _topBar() {
+  // ───────────────── TOP BAR ─────────────────
+  Widget _topBar(HeaderState state, HeaderBloc bloc) {
+    final acc = state.accounts[state.currentPage];
+
     return Row(
       children: [
         CircleIconButton(icon: Icons.menu, onTap: () {}),
+
         const SizedBox(width: 8),
 
         CircleIconButton(
-          icon: isHidden ? Icons.visibility_off : Icons.visibility,
-          onTap: () => setState(() => isHidden = !isHidden),
+          icon: state.isHidden ? Icons.visibility_off : Icons.visibility,
+          onTap: () => bloc.add(HeaderToggleHidden()),
         ),
+
         const SizedBox(width: 8),
 
         Expanded(
@@ -84,7 +93,7 @@ class _HeaderSectionState extends State<HeaderSection> {
               children: [
                 Expanded(
                   child: Text(
-                    accounts[currentPage].label,
+                    acc.label,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -112,10 +121,12 @@ class _HeaderSectionState extends State<HeaderSection> {
     );
   }
 
-  Widget _accountsPageView() {
+  // ───────────────── PAGE VIEW ─────────────────
+  Widget _accountsPageView(HeaderState state, HeaderBloc bloc) {
     return Stack(
       alignment: Alignment.center,
       children: [
+        // Graph background
         Positioned(
           bottom: 0,
           left: 0,
@@ -126,14 +137,16 @@ class _HeaderSectionState extends State<HeaderSection> {
           ),
         ),
 
+        // PageView
         SizedBox(
           height: 160,
           child: PageView.builder(
             controller: _controller,
-            itemCount: accounts.length,
-            onPageChanged: (i) => setState(() => currentPage = i),
+            itemCount: state.accounts.length,
+            onPageChanged: (i) => bloc.add(HeaderCurrentPageChanged(i)),
             itemBuilder: (context, index) {
-              final acc = accounts[index];
+              final acc = state.accounts[index];
+
               return Column(
                 children: [
                   Row(
@@ -141,7 +154,7 @@ class _HeaderSectionState extends State<HeaderSection> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        isHidden ? "•••••" : acc.solde.toStringAsFixed(2),
+                        state.isHidden ? "•••••" : acc.solde.toStringAsFixed(2),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 36,
@@ -155,6 +168,7 @@ class _HeaderSectionState extends State<HeaderSection> {
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 4),
                   Text(
                     'Solde Disponible',
@@ -163,12 +177,16 @@ class _HeaderSectionState extends State<HeaderSection> {
                       fontSize: 13,
                     ),
                   ),
+
                   const SizedBox(height: 12),
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        isHidden ? "•••••" : acc.veille.toStringAsFixed(2),
+                        state.isHidden
+                            ? "•••••"
+                            : acc.veille.toStringAsFixed(2),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -182,6 +200,7 @@ class _HeaderSectionState extends State<HeaderSection> {
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 4),
                   const Text(
                     'Solde veille',
@@ -193,7 +212,8 @@ class _HeaderSectionState extends State<HeaderSection> {
           ),
         ),
 
-        if (currentPage > 0)
+        // Arrow left
+        if (state.currentPage > 0)
           Positioned(
             left: 8,
             child: GestureDetector(
@@ -201,11 +221,12 @@ class _HeaderSectionState extends State<HeaderSection> {
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeOut,
               ),
-              child: _arrow(),
+              child: _arrow(isLeft: true),
             ),
           ),
 
-        if (currentPage < accounts.length - 1)
+        // Arrow right
+        if (state.currentPage < state.accounts.length - 1)
           Positioned(
             right: 8,
             child: GestureDetector(
@@ -220,7 +241,8 @@ class _HeaderSectionState extends State<HeaderSection> {
     );
   }
 
-  Widget _arrow({bool isLeft = true}) {
+  // ───────────────── ARROW ─────────────────
+  Widget _arrow({required bool isLeft}) {
     return Container(
       width: 40,
       height: 40,
@@ -236,14 +258,15 @@ class _HeaderSectionState extends State<HeaderSection> {
     );
   }
 
-  Widget _dotsIndicator() {
+  // ───────────────── DOTS ─────────────────
+  Widget _dotsIndicator(HeaderState state) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(
-        accounts.length,
+        state.accounts.length,
         (i) => Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: Dot(isActive: i == currentPage),
+          child: Dot(isActive: i == state.currentPage),
         ),
       ),
     );
