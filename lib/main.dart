@@ -1,6 +1,9 @@
 // lib/main.dart
 
+import 'package:first/blocs/header/header_event.dart';
 import 'package:first/blocs/transactions/transactions_bloc.dart';
+import 'package:first/core/network/api_client.dart';
+import 'package:first/features/home/repositories/account_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -34,11 +37,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
-
+    final apiClient = ApiClient();
+    final accountRepository = AccountRepository(api: apiClient);
     return MultiBlocProvider(
       providers: [
         // 🔁 Fournir le HeaderBloc globalement à toute l'application
-        BlocProvider<HeaderBloc>(create: (_) => HeaderBloc()),
+        BlocProvider<HeaderBloc>(
+          create: (_) =>
+              HeaderBloc(repository: accountRepository)
+                ..add(HeaderLoadAccounts()),
+        ),
+
         // 📍 Tu pourras ajouter d'autres blocs ici plus tard si besoin
       ],
       child: MaterialApp(
@@ -49,9 +58,9 @@ class MyApp extends StatelessWidget {
         darkTheme: AppThemes.darkTheme,
         themeMode: themeProvider.themeMode,
 
-        initialRoute: LoginScreen.routeName,
+        initialRoute: HomeScreen.routeName,
         routes: {
-          LoginScreen.routeName: (context) => const LoginScreen(),
+          // LoginScreen.routeName: (context) => const LoginScreen(),
           HomeScreen.routeName: (context) => const HomeScreen(),
         },
       ),

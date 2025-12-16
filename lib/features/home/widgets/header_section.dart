@@ -37,6 +37,42 @@ class _HeaderSectionState extends State<HeaderSection> {
       builder: (context, state) {
         final bloc = context.read<HeaderBloc>();
 
+        // 🔄 Chargement
+        if (state.isLoading) {
+          print("loading");
+          return const SizedBox(
+            height: 220,
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        // ❌ Erreur UNIQUEMENT s’il n’y a aucune donnée
+        if (state.error != null && state.accounts.isEmpty) {
+          return const SizedBox(
+            height: 220,
+            child: Center(
+              child: Text(
+                "Erreur de chargement",
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          );
+        }
+
+        // 📭 Aucun compte
+        if (state.accounts.isEmpty) {
+          return const SizedBox(
+            height: 220,
+            child: Center(
+              child: Text(
+                "Aucun compte disponible",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          );
+        }
+
+        // ✅ Données disponibles → affichage normal
         return Container(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
           decoration: const BoxDecoration(
@@ -67,12 +103,12 @@ class _HeaderSectionState extends State<HeaderSection> {
 
   // ───────────────── TOP BAR ─────────────────
   Widget _topBar(HeaderState state, HeaderBloc bloc) {
-    final acc = state.accounts[state.currentPage];
+    final acc =
+        state.accounts[state.currentPage.clamp(0, state.accounts.length - 1)];
 
     return Row(
       children: [
         CircleIconButton(icon: Icons.menu, onTap: () {}),
-
         const SizedBox(width: 8),
 
         CircleIconButton(
@@ -126,7 +162,6 @@ class _HeaderSectionState extends State<HeaderSection> {
     return Stack(
       alignment: Alignment.center,
       children: [
-        // Graph background
         Positioned(
           bottom: 0,
           left: 0,
@@ -137,7 +172,6 @@ class _HeaderSectionState extends State<HeaderSection> {
           ),
         ),
 
-        // PageView
         SizedBox(
           height: 160,
           child: PageView.builder(
@@ -212,7 +246,6 @@ class _HeaderSectionState extends State<HeaderSection> {
           ),
         ),
 
-        // Arrow left
         if (state.currentPage > 0)
           Positioned(
             left: 8,
@@ -225,7 +258,6 @@ class _HeaderSectionState extends State<HeaderSection> {
             ),
           ),
 
-        // Arrow right
         if (state.currentPage < state.accounts.length - 1)
           Positioned(
             right: 8,
