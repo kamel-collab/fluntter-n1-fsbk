@@ -9,9 +9,7 @@ class TransactionRepository {
   Future<List<TransactionModel>> fetchTransactions({
     required int accountId,
   }) async {
-    final response = await api.get(
-      '/api/public/accounts/$accountId/transactions',
-    );
+    final response = await api.get('/api/accounts/$accountId/transactions');
 
     final List list = response is List ? response : response['data'] as List;
 

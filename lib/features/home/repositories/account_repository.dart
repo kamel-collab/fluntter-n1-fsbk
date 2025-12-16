@@ -6,7 +6,7 @@ class AccountRepository {
 
   AccountRepository({required this.api});
   Future<List<Account>> fetchAccounts() async {
-    final response = await api.get('/api/public/accounts');
+    final response = await api.get('/api/accounts');
 
     final List list = response is List ? response : response['data'] as List;
 
