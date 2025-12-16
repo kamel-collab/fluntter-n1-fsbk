@@ -1,116 +1,95 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../blocs/transactions/transactions_bloc.dart';
+import '../../../blocs/transactions/transactions_event.dart';
+import '../../../blocs/transactions/transactions_state.dart';
 import '../models/transaction.dart';
 
-class TransactionsSection extends StatefulWidget {
+class TransactionsSection extends StatelessWidget {
   const TransactionsSection({super.key});
 
   @override
-  State<TransactionsSection> createState() => _TransactionsSectionState();
-}
-
-class _TransactionsSectionState extends State<TransactionsSection> {
-  TransactionType?
-  selectedFilter; // selectedFilter peut contenir un TransactionType… ou être null.
-
-  // MOCK DATA (sera remplacé par API + BLoC aux jours 3-4)
-  final List<TransactionModel> all = const [
-    TransactionModel(
-      title: "Retrait CHQ GUI N 00000",
-      date: "04 Juin 2025",
-      amount: -10000,
-      type: TransactionType.depense,
-      group: "Aujourd’hui",
-    ),
-    TransactionModel(
-      title: "Virement reçu",
-      date: "04 Juin 2025",
-      amount: 15000,
-      type: TransactionType.revenu,
-      group: "Aujourd’hui",
-    ),
-    TransactionModel(
-      title: "Virement reçu AXA",
-      date: "03 Juin 2025",
-      amount: 5405.06,
-      type: TransactionType.revenu,
-      group: "Hier",
-    ),
-    TransactionModel(
-      title: "Retrait CHQ GUI N 00000",
-      date: "03 Juin 2025",
-      amount: -10000,
-      type: TransactionType.depense,
-      group: "Lundi",
-    ),
-  ];
-
-  @override
   Widget build(BuildContext context) {
-    // filtrage logique
-    final List<TransactionModel> filtered = selectedFilter == null
-        ? all
-        : all.where((t) => t.type == selectedFilter).toList();
+    return BlocBuilder<TransactionsBloc, TransactionsState>(
+      builder: (context, state) {
+        if (state.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-    // regroupement par groupe
-    final Map<String, List<TransactionModel>> groups = {};
-    for (var t in filtered) {
-      groups.putIfAbsent(t.group, () => []);
-      groups[t.group]!.add(t);
-    }
+        if (state.error != null && state.all.isEmpty) {
+          return const Center(
+            child: Text(
+              "Erreur de chargement des transactions",
+              style: TextStyle(color: Colors.red),
+            ),
+          );
+        }
 
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      physics: const BouncingScrollPhysics(),
-      children: [
-        const Text(
-          "Transactions récentes",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 16),
+        if (state.all.isEmpty) {
+          return const Center(child: Text("Aucune transaction"));
+        }
+        return ListView(
+          padding: const EdgeInsets.all(16),
+          physics: const BouncingScrollPhysics(),
+          children: [
+            const Text(
+              "Transactions récentes",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
 
-        _filters(),
-        const SizedBox(height: 16),
+            _filters(context, state),
+            const SizedBox(height: 16),
 
-        for (var entry in groups.entries) ...[
-          Text(
-            entry.key,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 8),
+            for (var entry in state.grouped.entries) ...[
+              Text(
+                entry.key,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
 
-          for (var t in entry.value) _transactionCard(t),
+              for (var t in entry.value) _transactionCard(t),
 
-          const SizedBox(height: 24),
-        ],
-      ],
+              const SizedBox(height: 24),
+            ],
+          ],
+        );
+      },
     );
   }
 
-  // ------------------------------------------------------------
-  // Filtres (Tout / Revenus / Dépenses)
-  // ------------------------------------------------------------
-  Widget _filters() {
+  // ───────────────── FILTERS ─────────────────
+  Widget _filters(BuildContext context, TransactionsState state) {
     return Row(
       children: [
-        _filterButton("Tout", null),
+        _filterButton(context, "Tout", null, state),
         const SizedBox(width: 8),
-        _filterButton("Revenus", TransactionType.revenu),
+        _filterButton(context, "Revenus", TransactionType.revenu, state),
         const Spacer(),
-        _filterButton("Dépenses", TransactionType.depense),
+        _filterButton(context, "Dépenses", TransactionType.depense, state),
       ],
     );
   }
 
-  Widget _filterButton(String text, TransactionType? filterType) {
-    final bool active = selectedFilter == filterType;
+  Widget _filterButton(
+    BuildContext context,
+    String text,
+    TransactionType? filter,
+    TransactionsState state,
+  ) {
+    final bool active = state.selectedFilter == filter;
 
     Color color;
     IconData? icon;
 
-    if (filterType == TransactionType.revenu) {
+    if (filter == TransactionType.revenu) {
       color = const Color(0xFF42C76A);
       icon = Icons.arrow_downward;
-    } else if (filterType == TransactionType.depense) {
+    } else if (filter == TransactionType.depense) {
       color = const Color(0xFFE36161);
       icon = Icons.arrow_upward;
     } else {
@@ -118,7 +97,9 @@ class _TransactionsSectionState extends State<TransactionsSection> {
     }
 
     return GestureDetector(
-      onTap: () => setState(() => selectedFilter = filterType),
+      onTap: () => context.read<TransactionsBloc>().add(
+        TransactionsFilterChanged(filter),
+      ),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
@@ -145,9 +126,7 @@ class _TransactionsSectionState extends State<TransactionsSection> {
     );
   }
 
-  // ------------------------------------------------------------
-  // Transaction Card (design moderne)
-  // ------------------------------------------------------------
+  // ───────────────── CARD ─────────────────
   Widget _transactionCard(TransactionModel t) {
     final bool isIncome = t.type == TransactionType.revenu;
 
@@ -167,7 +146,6 @@ class _TransactionsSectionState extends State<TransactionsSection> {
       ),
       child: Row(
         children: [
-          // cercle icône
           Container(
             width: 40,
             height: 40,
@@ -180,10 +158,7 @@ class _TransactionsSectionState extends State<TransactionsSection> {
               color: isIncome ? Colors.green : Colors.red,
             ),
           ),
-
           const SizedBox(width: 12),
-
-          // titre + date
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,8 +178,6 @@ class _TransactionsSectionState extends State<TransactionsSection> {
               ],
             ),
           ),
-
-          // montant
           Text(
             "${t.amount > 0 ? '+' : ''}${t.amount.toStringAsFixed(2)} DZD",
             style: TextStyle(

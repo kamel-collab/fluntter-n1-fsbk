@@ -2,8 +2,10 @@
 
 import 'package:first/blocs/header/header_event.dart';
 import 'package:first/blocs/transactions/transactions_bloc.dart';
+import 'package:first/blocs/transactions/transactions_event.dart';
 import 'package:first/core/network/api_client.dart';
 import 'package:first/features/home/repositories/account_repository.dart';
+import 'package:first/features/home/repositories/transaction_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -21,10 +23,7 @@ import 'package:first/blocs/header/header_bloc.dart';
 void main() {
   runApp(
     MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        BlocProvider<TransactionsBloc>(create: (_) => TransactionsBloc()),
-      ],
+      providers: [ChangeNotifierProvider(create: (_) => ThemeProvider())],
 
       child: const MyApp(),
     ),
@@ -39,6 +38,7 @@ class MyApp extends StatelessWidget {
     final themeProvider = context.watch<ThemeProvider>();
     final apiClient = ApiClient();
     final accountRepository = AccountRepository(api: apiClient);
+    final transactionRepository = TransactionRepository(api: apiClient);
     return MultiBlocProvider(
       providers: [
         // 🔁 Fournir le HeaderBloc globalement à toute l'application
@@ -47,7 +47,11 @@ class MyApp extends StatelessWidget {
               HeaderBloc(repository: accountRepository)
                 ..add(HeaderLoadAccounts()),
         ),
-
+        BlocProvider<TransactionsBloc>(
+          create: (_) =>
+              TransactionsBloc(repository: transactionRepository)
+                ..add(TransactionsLoadRequested(1)),
+        ),
         // 📍 Tu pourras ajouter d'autres blocs ici plus tard si besoin
       ],
       child: MaterialApp(
