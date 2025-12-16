@@ -9,6 +9,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc({required this.repository}) : super(AuthState.initial()) {
     on<AuthLoginRequested>(_onLogin);
     on<AuthLogoutRequested>(_onLogout);
+    on<AuthRestoreSession>(_onRestoreSession);
   }
 
   Future<void> _onLogin(
@@ -26,7 +27,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  void _onLogout(AuthLogoutRequested event, Emitter<AuthState> emit) {
+  Future<void> _onRestoreSession(
+    AuthRestoreSession event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(isLoading: true));
+
+    final restored = await repository.restoreSession();
+
+    emit(state.copyWith(isAuthenticated: restored, isLoading: false));
+  }
+
+  Future<void> _onLogout(
+    AuthLogoutRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    await repository.logout();
     emit(AuthState.initial());
   }
 }

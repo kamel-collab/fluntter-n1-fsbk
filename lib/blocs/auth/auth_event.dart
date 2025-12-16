@@ -8,3 +8,5 @@ class AuthLoginRequested extends AuthEvent {
 }
 
 class AuthLogoutRequested extends AuthEvent {}
+
+class AuthRestoreSession extends AuthEvent {}

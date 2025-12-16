@@ -1,5 +1,8 @@
 // lib/main.dart
 
+import 'package:first/app_root.dart';
+import 'package:first/blocs/auth/auth_event.dart';
+import 'package:first/core/auth/session_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -43,8 +46,14 @@ class MyApp extends StatelessWidget {
     // 🔌 Réseau
     final apiClient = ApiClient();
 
+    // 🔐 Session
+    final sessionStorage = SessionStorage();
+
     // 📦 Repositories
-    final authRepository = AuthRepository(api: apiClient);
+    final authRepository = AuthRepository(
+      api: apiClient,
+      sessionStorage: sessionStorage,
+    );
     final accountRepository = AccountRepository(api: apiClient);
     final transactionRepository = TransactionRepository(api: apiClient);
 
@@ -52,7 +61,8 @@ class MyApp extends StatelessWidget {
       providers: [
         // 🔐 AUTH — OBLIGATOIRE
         BlocProvider<AuthBloc>(
-          create: (_) => AuthBloc(repository: authRepository),
+          create: (_) =>
+              AuthBloc(repository: authRepository)..add(AuthRestoreSession()),
         ),
 
         // 💳 Header
@@ -73,7 +83,7 @@ class MyApp extends StatelessWidget {
         darkTheme: AppThemes.darkTheme,
         themeMode: themeProvider.themeMode,
 
-        initialRoute: LoginScreen.routeName,
+        home: const AppRoot(),
         routes: {
           LoginScreen.routeName: (_) => const LoginScreen(),
           HomeScreen.routeName: (_) => const HomeScreen(),
