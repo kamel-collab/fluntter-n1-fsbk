@@ -1,8 +1,7 @@
-import 'package:first/blocs/auth/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../providers/theme_provider.dart';
-import '../../../blocs/auth/auth_bloc.dart';
+
 import '../../../blocs/header/header_bloc.dart';
 import '../../../blocs/header/header_event.dart';
 import '../../../blocs/transactions/transactions_bloc.dart';
@@ -10,6 +9,7 @@ import '../../../blocs/transactions/transactions_event.dart';
 
 import '../widgets/header_section.dart';
 import '../widgets/transactions_section.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = "/home";
@@ -24,7 +24,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-
+    _initNotifications();
+    //sabner a un topic all
+    FirebaseMessaging.instance.subscribeToTopic("all");
     // ⏳ attendre que le widget soit monté
     Future.microtask(() {
       context.read<HeaderBloc>().add(HeaderLoadAccounts());
@@ -59,5 +61,25 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _initNotifications() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+    // Permission Android 13+
+    await messaging.requestPermission();
+
+    // Token (très important pour le TP)
+    final token = await messaging.getToken();
+    print("🔥 FCM TOKEN = $token");
+
+    // Écoute quand app ouverte
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message.notification?.title ?? "Nouvelle notification"),
+        ),
+      );
+    });
   }
 }

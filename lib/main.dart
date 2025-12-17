@@ -26,8 +26,13 @@ import 'blocs/transactions/transactions_bloc.dart';
 // screens
 import 'features/auth/pages/login_screen.dart';
 import 'features/home/pages/home_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp();
+
   runApp(
     MultiProvider(
       providers: [ChangeNotifierProvider(create: (_) => ThemeProvider())],
