@@ -1,3 +1,5 @@
+import 'package:first/core/network/api_client.dart';
+import 'package:first/features/qr/pages/qr_scanner_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -152,7 +154,45 @@ class _HeaderSectionState extends State<HeaderSection> {
         const SizedBox(width: 8),
         CircleIconButton(icon: Icons.notifications_none, onTap: () {}),
         const SizedBox(width: 8),
-        CircleIconButton(icon: Icons.qr_code_2, onTap: () {}),
+        CircleIconButton(
+          icon: Icons.qr_code_2,
+          onTap: () async {
+            final result = await Navigator.push<String>(
+              context,
+              MaterialPageRoute(builder: (_) => const QrScannerScreen()),
+            );
+
+            if (result == null) return;
+
+            // 🔍 Vérification simple de l’URL
+            if (!result.endsWith('/api/transfer')) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text("QR invalide")));
+              return;
+            }
+
+            try {
+              final apiClient = context.read<ApiClient>();
+
+              await apiClient.transfer(
+                fromAccountId: 1,
+                toAccountId: 2,
+                amount: 500,
+              );
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("✅ Transfert effectué avec succès"),
+                ),
+              );
+            } catch (e) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text("❌ Erreur transfert")));
+            }
+          },
+        ),
       ],
     );
   }

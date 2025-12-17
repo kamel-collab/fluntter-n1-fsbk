@@ -57,4 +57,21 @@ class ApiClient {
       throw Exception('API Error ${response.statusCode}');
     }
   }
+
+  /// 🔁 Transfert interne (utilise le Bearer token)
+  Future<Map<String, dynamic>> transfer({
+    required int fromAccountId,
+    required int toAccountId,
+    required double amount,
+    String title = "Transfert",
+  }) async {
+    final response = await post('/api/transfer', {
+      'from_account_id': fromAccountId,
+      'to_account_id': toAccountId,
+      'amount': amount,
+      'title': title,
+    });
+
+    return response as Map<String, dynamic>;
+  }
 }

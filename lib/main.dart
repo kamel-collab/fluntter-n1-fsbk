@@ -57,37 +57,33 @@ class MyApp extends StatelessWidget {
     final accountRepository = AccountRepository(api: apiClient);
     final transactionRepository = TransactionRepository(api: apiClient);
 
-    return MultiBlocProvider(
-      providers: [
-        // 🔐 AUTH — OBLIGATOIRE
-        BlocProvider<AuthBloc>(
-          create: (_) =>
-              AuthBloc(repository: authRepository)..add(AuthRestoreSession()),
+    return Provider<ApiClient>.value(
+      value: apiClient,
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthBloc>(
+            create: (_) =>
+                AuthBloc(repository: authRepository)..add(AuthRestoreSession()),
+          ),
+          BlocProvider<HeaderBloc>(
+            create: (_) => HeaderBloc(repository: accountRepository),
+          ),
+          BlocProvider<TransactionsBloc>(
+            create: (_) => TransactionsBloc(repository: transactionRepository),
+          ),
+        ],
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: "Bank App",
+          theme: AppThemes.lightTheme,
+          darkTheme: AppThemes.darkTheme,
+          themeMode: themeProvider.themeMode,
+          home: const AppRoot(),
+          routes: {
+            LoginScreen.routeName: (_) => const LoginScreen(),
+            HomeScreen.routeName: (_) => const HomeScreen(),
+          },
         ),
-
-        // 💳 Header
-        BlocProvider<HeaderBloc>(
-          create: (_) => HeaderBloc(repository: accountRepository),
-        ),
-
-        // 📜 Transactions
-        BlocProvider<TransactionsBloc>(
-          create: (_) => TransactionsBloc(repository: transactionRepository),
-        ),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: "Bank App",
-
-        theme: AppThemes.lightTheme,
-        darkTheme: AppThemes.darkTheme,
-        themeMode: themeProvider.themeMode,
-
-        home: const AppRoot(),
-        routes: {
-          LoginScreen.routeName: (_) => const LoginScreen(),
-          HomeScreen.routeName: (_) => const HomeScreen(),
-        },
       ),
     );
   }
