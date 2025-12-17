@@ -190,4 +190,4 @@ Usage principal	Tests, partage	Production (Play Store)
 📄 Documente bien ton processus dans ton repo GitHub
 
 🎉 Félicitations !
-Tu as maintenant un guide complet pour gérer APK + AAB + publication Play Store avec Flutter.
+Tu as maintenant un guide complet pour gérer APK + AAB + publication Play Store avec Flutter
